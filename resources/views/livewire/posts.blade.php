@@ -18,13 +18,13 @@
         <div class="flex items-center justify-between pt-4 border-t border-purple-500/20">
             <div class="flex items-center space-x-4">
                 <!-- Image Upload Button -->
-                <label for="imageUpload" class="flex items-center space-x-2 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 hover:text-white px-4 py-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105">
+                <label for="mediaUpload" class="flex items-center space-x-2 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 hover:text-white px-4 py-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
                     </svg>
-                    <span class="text-sm font-medium">Photo</span>
+                    <span class="text-sm font-medium">Photo/Video</span>
                 </label>
-                <input id="imageUpload" wire:model="image" type="file" accept="image/*" class="hidden">
+                <input id="mediaUpload" wire:model="media" type="file" accept="image/*,video/*" class="hidden">
                 
                 <!-- Emoji Button -->
                 <div x-data="{ open: false, emojis: ['😊','😍','😎','🥳','😇','😭','😡','🤩','😴','🤔','😜','😱','🥰','😏','😤','😅','😬','😃','😢','😆'] }" class="relative">
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Image Preview -->
-        @if($image)
+        @if($media)
             <div class="mt-4 relative">
                 <div class="bg-gray-800/50 rounded-2xl p-4 border border-purple-400/20">
                     <div class="flex items-center justify-between mb-2">
@@ -62,15 +62,15 @@
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
                             </svg>
-                            <span>Image attached</span>
+                            <span>{{ Str::startsWith($media->getMimeType(), 'image/') ? 'Image' : 'Video' }} attached</span>
                         </span>
-                        <button type="button" wire:click="$set('image', null)" class="text-red-400 hover:text-red-300 transition-colors duration-200">
+                        <button type="button" wire:click="$set('media', null)" class="text-red-400 hover:text-red-300 transition-colors duration-200">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                             </svg>
                         </button>
                     </div>
-                    <div class="text-purple-300 text-xs">{{ $image->getClientOriginalName() }}</div>
+                    <div class="text-purple-300 text-xs">{{ $media->getClientOriginalName() }}</div>
                 </div>
             </div>
         @endif
@@ -94,29 +94,58 @@
                             <span>{{ $post->created_at->diffForHumans() }}</span>
                         </div>
                     </div>
-                    <div class="relative">
-                        <button class="text-purple-300 hover:text-purple-200 p-2 rounded-full hover:bg-purple-800/30 transition-all duration-200">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
-                            </svg>
-                        </button>
-                    </div>
+                    @if($post->user_id === Auth::id())
+                        <div class="relative">
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open" class="text-purple-300 hover:text-purple-200 p-2 rounded-full hover:bg-purple-800/30 transition-all duration-200">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                                </svg>
+                            </button>
+                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-40 bg-black/90 border border-purple-500/30 rounded-xl shadow-lg z-20">
+                                <ul class="py-2">
+                                    <li>
+                                        <button wire:click="startEdit({{ $post->id }})" class="w-full text-left px-4 py-2 text-purple-200 hover:bg-purple-800/40 hover:text-white transition-all">Edit</button>
+                                    </li>
+                                    <li>
+                                        <button wire:click="deletePost({{ $post->id }})" class="w-full text-left px-4 py-2 text-red-400 hover:bg-red-700/40 hover:text-white transition-all">Delete</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Post Content -->
                 <div class="mb-4 flex items-center space-x-2">
-                    <p class="text-white text-lg leading-relaxed flex-1">{{ $post->content }}</p>
-                    @if($post->feeling)
-                        <span class="text-2xl">{{ $post->feeling }}</span>
+                    @if(isset($editing) && $editing === $post->id)
+                        <form wire:submit.prevent="updatePost({{ $post->id }})" class="flex-1 flex items-center space-x-2">
+                            <input wire:model.defer="editContent" type="text" class="w-full bg-gray-800/50 text-white rounded-2xl p-2 border border-purple-400/30 focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition-all duration-300 text-lg" />
+                            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl">Save</button>
+                            <button type="button" wire:click="cancelEdit" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-xl">Cancel</button>
+                        </form>
+                    @else
+                        <p class="text-white text-lg leading-relaxed flex-1">{{ $post->content }}</p>
+                        @if($post->feeling)
+                            <span class="text-2xl">{{ $post->feeling }}</span>
+                        @endif
                     @endif
                 </div>
 
-                <!-- Post Image -->
+                <!-- Post Media -->
                 @if($post->image)
                     <div class="mb-4">
-                        <img src="{{ asset('storage/' . $post->image) }}" 
-                             alt="Post image" 
-                             class="rounded-2xl w-full object-cover max-h-96 shadow-lg border border-purple-500/10">
+                        @if(Str::startsWith($post->media_type, 'image/'))
+                            <img src="{{ asset('storage/' . $post->image) }}" 
+                                 alt="Post image" 
+                                 class="rounded-2xl w-full object-cover max-h-96 shadow-lg border border-purple-500/10">
+                        @elseif(Str::startsWith($post->media_type, 'video/'))
+                            <video controls class="rounded-2xl w-full max-h-96 shadow-lg border border-purple-500/10">
+                                <source src="{{ asset('storage/' . $post->image) }}" type="{{ $post->media_type }}">
+                                Your browser does not support the video tag.
+                            </video>
+                        @endif
                     </div>
                 @endif
 
@@ -145,15 +174,6 @@
                                 </svg>
                             </div>
                             <span class="font-medium">{{ $post->comments->count() }}</span>
-                        </button>
-
-                        <!-- Share Button -->
-                        <button class="flex items-center space-x-2 text-purple-300 hover:text-green-400 transition-all duration-300 hover:scale-105 group">
-                            <div class="p-2 rounded-full group-hover:bg-green-500/10 transition-all duration-300">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
-                                </svg>
-                            </div>
                         </button>
                     </div>
                 </div>

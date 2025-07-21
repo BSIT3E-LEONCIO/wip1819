@@ -13,33 +13,79 @@ class Posts extends Component
     use WithFileUploads;
 
     public $content = '';
-    public $image;
+    public $media;
     public $comment = '';
     public $postId;
     public $feeling = '';
+    public $editing = null;
+    public $editContent = '';
+    public $posts;
 
     protected $rules = [
         'content' => 'required|string|max:1000',
-        'image' => 'nullable|image|max:2048',
+        'media' => 'nullable|file|max:10240', // 10MB max for image/video
         'feeling' => 'nullable|string|max:10',
     ];
 
     public function submit()
     {
         $this->validate();
-        $imagePath = $this->image ? $this->image->store('posts', 'public') : null;
-        
+        $mediaPath = $this->media ? $this->media->store('posts', 'public') : null;
+        $mediaType = $this->media ? $this->media->getMimeType() : null;
+
         Post::create([
             'user_id' => Auth::id(),
             'content' => $this->content,
-            'image' => $imagePath,
+            'image' => $mediaPath, // reuse image column for both image/video
             'feeling' => $this->feeling,
+            'media_type' => $mediaType,
         ]);
-        
-        $this->reset(['content', 'image', 'feeling']);
-        
-        // Add success message or notification here if needed
+
+        $this->reset(['content', 'media', 'feeling']);
+
         session()->flash('message', 'Post created successfully!');
+    }
+    
+    public function startEdit($postId)
+    {
+        $post = Post::findOrFail($postId);
+        // Only allow editing own post
+        if ($post->user_id !== Auth::id()) return;
+        $this->editing = $postId;
+        $this->editContent = $post->content;
+    }
+
+    public function updatePost($postId)
+    {
+        $post = Post::findOrFail($postId);
+        if ($post->user_id !== Auth::id()) return;
+        $this->validate([
+            'editContent' => 'required|string|max:1000',
+        ]);
+        $post->content = $this->editContent;
+        $post->save();
+        $this->editing = null;
+        $this->editContent = '';
+        $this->refreshPosts();
+    }
+
+    public function cancelEdit()
+    {
+        $this->editing = null;
+        $this->editContent = '';
+    }
+
+    public function deletePost($postId)
+    {
+        $post = Post::findOrFail($postId);
+        if ($post->user_id !== Auth::id()) return;
+        $post->delete();
+        $this->refreshPosts();
+    }
+
+    public function refreshPosts()
+    {
+        $this->posts = Post::with(['user', 'comments.user', 'likes'])->latest()->get();
     }
 
     public function like($id)
@@ -72,7 +118,7 @@ class Posts extends Component
 
     public function render()
     {
-        $posts = Post::with(['user', 'comments.user', 'likes'])->latest()->get();
-        return view('livewire.posts', compact('posts'));
+        $this->posts = Post::with(['user', 'comments.user', 'likes'])->latest()->get();
+        return view('livewire.posts', ['posts' => $this->posts]);
     }
 }

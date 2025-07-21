@@ -13,7 +13,7 @@ class Post extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'content', 'image', 'feeling'
+        'user_id', 'content', 'image', 'feeling', 'media_type'
     ];
 
     public function user(): BelongsTo
