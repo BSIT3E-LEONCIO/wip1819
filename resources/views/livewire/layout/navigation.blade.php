@@ -41,6 +41,11 @@ new class extends Component
                         </svg>
                         {{ __('Dashboard') }}
                     </a>
+                    <a href="{{ route('music') }}" 
+                       class="inline-flex items-center px-4 py-2 border-b-2 {{ request()->routeIs('music') ? 'border-purple-400 text-purple-300' : 'border-transparent text-gray-300 hover:text-purple-200 hover:border-purple-500/50' }} text-sm font-medium leading-5 transition duration-300 ease-in-out"
+                       wire:navigate>
+                        {{ __('Music') }}
+                    </a>
                 </div>
             </div>
 

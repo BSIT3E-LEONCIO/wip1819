@@ -14,7 +14,7 @@ class Posts extends Component
 
     public $content = '';
     public $media;
-    public $comment = '';
+    public $comments = [];
     public $postId;
     public $feeling = '';
     public $editing = null;
@@ -98,17 +98,15 @@ class Posts extends Component
 
     public function addComment($id)
     {
-        if (empty($this->comment)) {
+        if (empty($this->comments[$id])) {
             return;
         }
-        
         Comment::create([
             'user_id' => Auth::id(),
             'post_id' => $id,
-            'comment' => $this->comment,
+            'comment' => $this->comments[$id],
         ]);
-        
-        $this->reset('comment');
+        $this->comments[$id] = '';
     }
 
     public function setFeeling($emoji)

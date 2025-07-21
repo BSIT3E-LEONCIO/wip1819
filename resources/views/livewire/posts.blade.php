@@ -209,7 +209,7 @@
                         {{ substr(auth()->user()->name, 0, 1) }}
                     </div>
                     <div class="flex-1 relative">
-                        <input wire:model="comment" 
+                        <input wire:model="comments.{{ $post->id }}" 
                                type="text" 
                                class="w-full bg-gray-800/50 text-purple-100 rounded-full py-3 px-4 pr-12 border border-purple-400/30 focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition-all duration-300" 
                                placeholder="Write a comment...">
