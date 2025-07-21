@@ -114,6 +114,13 @@ new class extends Component
                 </svg>
                 <span>{{ __('Dashboard') }}</span>
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('music')" :active="request()->routeIs('music')" wire:navigate 
+                                   class="{{ request()->routeIs('music') ? 'bg-purple-800/50 border-purple-400 text-purple-300' : 'border-transparent text-gray-300 hover:text-purple-200 hover:bg-purple-900/30 hover:border-purple-500/50' }} flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 00-1 1v11.382A3 3 0 1011 17V4h3V2H9z" />
+                </svg>
+                <span>{{ __('Music') }}</span>
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->

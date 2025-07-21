@@ -2,11 +2,11 @@
     <!-- Create Post -->
     <form wire:submit.prevent="submit" class="bg-black/40 backdrop-blur-xl border border-purple-500/20 rounded-3xl p-8 shadow-2xl mb-8">
         <!-- User Avatar and Text Area -->
-        <div class="flex items-start space-x-4 mb-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6">
             <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                 {{ substr(auth()->user()->name, 0, 1) }}
             </div>
-            <div class="flex-1">
+            <div class="flex-1 w-full">
                 <textarea wire:model="content" 
                           rows="3" 
                           class="w-full bg-gray-800/50 text-white rounded-2xl p-4 border border-purple-400/30 focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 resize-none transition-all duration-300 text-lg placeholder-purple-300/60" 
@@ -15,20 +15,19 @@
         </div>
 
         <!-- Action Bar -->
-        <div class="flex items-center justify-between pt-4 border-t border-purple-500/20">
-            <div class="flex items-center space-x-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-purple-500/20 gap-4">
+            <div class="flex flex-col sm:flex-row w-full gap-2 sm:gap-4">
                 <!-- Image Upload Button -->
-                <label for="mediaUpload" class="flex items-center space-x-2 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 hover:text-white px-4 py-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105">
+                <label for="mediaUpload" class="flex items-center space-x-2 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 hover:text-white px-4 py-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 w-full sm:w-auto">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
                     </svg>
                     <span class="text-sm font-medium">Photo/Video</span>
                 </label>
                 <input id="mediaUpload" wire:model="media" type="file" accept="image/*,video/*" class="hidden">
-                
                 <!-- Emoji Button -->
-                <div x-data="{ open: false, emojis: ['😊','😍','😎','🥳','😇','😭','😡','🤩','😴','🤔','😜','😱','🥰','😏','😤','😅','😬','😃','😢','😆'] }" class="relative">
-                    <button type="button" @click="open = !open" class="flex items-center space-x-2 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 hover:text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105">
+                <div x-data="{ open: false, emojis: ['😊','😍','😎','🥳','😇','😭','😡','🤩','😴','🤔','😜','😱','🥰','😏','😤','😅','😬','😃','😢','😆'] }" class="relative w-full sm:w-auto">
+                    <button type="button" @click="open = !open" class="flex items-center space-x-2 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 hover:text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd"/>
                         </svg>
